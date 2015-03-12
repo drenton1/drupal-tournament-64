@@ -1,0 +1,146 @@
+/*
+ *  Tournament 64 CSS
+ */
+input.tour64-team-pick {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  height: 21px;
+  cursor: pointer;
+}
+
+.tour64-team {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  height: 22px;
+  width: 92px;
+  overflow: hidden;
+}
+
+.tour64-bracket-block {
+  white-space: nowrap;
+}
+
+.tour64-match-lost {
+    text-decoration: line-through;
+    color: #FF0000;
+}
+.tour64-match-won {
+    color: #008000;
+	font-weight: bold;
+}
+
+.tour64-match-left {
+  border-top-style: solid;
+  border-right-style: solid;
+  border-bottom-style: solid;
+  border-top-width: 1px;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+  padding-left: 3px;
+}
+
+.tour64-match-right {
+  border-top-style: solid;
+  border-left-style: solid;
+  border-bottom-style: solid;
+  border-top-width: 1px;
+  border-left-width: 1px;
+  border-bottom-width: 1px;
+  padding-left: 3px;
+}
+
+.tour64-match-centre {
+  padding-left: 3px;
+}
+
+.tour64-round-1-left {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.tour64-round-1-right {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.tour64-round-2-left {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.tour64-round-2-right {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.tour64-round-3-left {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.tour64-round-3-right {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.tour64-round-4-left {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  left: -20px;
+}
+
+.tour64-round-4-right {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  right: -20px;
+}
+
+.tour64-round-5-left {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  left: -40px;
+}
+
+.tour64-round-5-right {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  right: -40px;
+}
+
+.tour64-round-6-centre {
+  display: inline-block;
+  vertical-align: middle;
+  position: relative;
+  left: -30px;
+  width: 33px;
+}
+
+.tour64-round-1-spacer {
+  height: 5px;
+}
+
+.tour64-round-2-spacer {
+  height: 33px;
+}
+
+.tour64-round-3-spacer {
+  height: 89px;
+}
+
+.tour64-round-4-spacer {
+  height: 201px;
+}
+
+.tour64-round-5-spacer {
+  height: 425px;
+}
+
+.tour64-round-6-spacer {
+  height: 33px;
+}
