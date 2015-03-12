@@ -1,0 +1,8 @@
+name = Tournament 64
+description = Single Elimination 64 Team Tournament
+version = 7.x-1.0
+core = 7.x
+files[] = tournament_64.controller.inc
+dependencies[] = date_popup
+dependencies[] = entity
+dependencies[] = views
