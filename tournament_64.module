@@ -1,0 +1,718 @@
+<?php
+
+/**
+ * @file
+ * Tournament 64 main module file
+ *
+ */
+
+/**
+ * Implements hook_entity_delete().
+ */
+function tournament_64_entity_delete($entity, $type) {
+  
+  // delete entry winners
+  if ($type == 'tour64_entries') {
+    $num_deleted = db_delete('tour64_entry_winners')
+      ->condition('entry_id', $entity->entry_id, '=')
+      ->execute();
+    
+  }
+
+  // delete league winners and teams
+  if ($type == 'tour64_leagues') {
+    $num_deleted = db_delete('tour64_league_winners')
+      ->condition('league_id', $entity->league_id, '=')
+      ->execute();
+    
+    $num_deleted = db_delete('tour64_league_teams')
+      ->condition('league_id', $entity->league_id, '=')
+      ->execute();
+  }
+  
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function tournament_64_entity_info() {
+  $entities = array(
+    'tour64_leagues' => array(
+      'label' => t('Tournament 64 League'),
+      'plural label' => t('Tournament 64 Leagues'),
+      'entity class' => 'Tour64Leagues',
+      'controller class' => 'Tour64LeaguesEntityController',
+      'extra fields controller class' => 'EntityDefaultExtraFieldsController',
+      'base table' => 'tour64_leagues',
+      'fieldable' => FALSE,
+      'entity keys' => array(
+        'id' => 'league_id',
+      ),
+      'views controller class' => 'EntityDefaultViewsController',
+      'label callback' => 'entity_class_label',
+      'uri callback' => 'entity_class_uri',
+      'module' => 'tournament_64',
+      'access callback' => 'tour64_entity_access',
+    ),
+    'tour64_entries' => array(
+      'label' => t('Tournament 64 Entry'),
+      'plural label' => t('Tournament 64 Entries'),
+      'entity class' => 'Tour64Entries',
+      'controller class' => 'Tour64EntriesEntityController',
+      'extra fields controller class' => 'EntityDefaultExtraFieldsController',
+      'base table' => 'tour64_entries',
+      'fieldable' => FALSE,
+      'entity keys' => array(
+        'id' => 'entry_id',
+      ),
+      'views controller class' => 'EntityDefaultViewsController',
+      'label callback' => 'entity_class_label',
+      'uri callback' => 'entity_class_uri',
+      'module' => 'tournament_64',
+      'access callback' => 'tour64_entity_access',
+    ),
+  );
+
+  return $entities;
+}
+
+/**
+ * Implements hook_entity_insert().
+ * 
+ * create team and winner records
+ */
+function tournament_64_entity_insert($entity, $type) {
+    
+  if ($type == 'tour64_leagues') {
+    $seeds = array(1, 16, 8, 9, 5, 12, 4, 13, 6, 11, 3, 14, 7, 10, 2, 15);
+    $current_seed = 1;
+    $current_section = 1;
+    for ($i = 1; $i <= 64; $i++) {
+      $id = db_insert('tour64_league_teams')
+        ->fields(array(
+          'team_id' => $i,
+          'league_id' => $entity->league_id,
+          'seed' => $seeds[$current_seed-1],
+          'description' => NULL,
+          'section' => $current_section,
+        ))
+        ->execute();
+
+      if($i %16 == 0) {
+        $current_seed = 0;
+        $current_section++;
+      }
+      $current_seed++;
+    }
+    for ($i = 1; $i <= 63; $i++) {
+      $id = db_insert('tour64_league_winners')
+        ->fields(array(
+          'winner_id' => $i,
+          'team_id' => NULL,
+          'league_id' => $entity->league_id,
+        ))
+        ->execute();
+    }
+  } elseif ($type == 'tour64_entries') {
+    for ($i = 1; $i <= 63; $i++) {
+      if (!empty($entity->winners[$i])) {
+        $team_id = $entity->winners[$i];
+      } else {
+        $team_id = NULL;
+      }
+      $id = db_insert('tour64_entry_winners')
+        ->fields(array(
+          'winner_id' => $i,
+          'team_id' => $team_id,
+          'entry_id' => $entity->entry_id,
+        ))
+        ->execute();
+    }
+  }
+  
+}
+
+/**
+ * Implements hook_entity_presave().
+ */
+function tournament_64_entity_presave($entity, $type) {
+
+  if ($type == 'tour64_leagues') {
+    for ($i = 1; $i <= 6; $i++) {
+      $field = 'round_' . $i . '_points';
+      $entity->$field = $entity->points[$i];
+    }
+    for ($i = 1; $i <= 4; $i++) {
+      $field = 'section_' . $i . '_name';
+      $entity->$field = $entity->sections[$i];
+    }
+  }
+  
+}
+
+/**
+ * Implements hook_entity_update().
+ * 
+ * save teams and winners
+ */
+function tournament_64_entity_update($entity, $type) {
+  
+  if ($type == 'tour64_leagues') {
+    if (!empty($entity->teams_section_1)) {
+      for ($i = 1; $i <= 4; $i++) {
+        $current_section = 'teams_section_' . $i;
+        foreach ($entity->$current_section as $key => $value) {
+          $num_updated = db_update('tour64_league_teams')
+            ->fields(array(
+              'description' => $value,
+            ))
+            ->condition('league_id', $entity->league_id, '=')
+            ->condition('team_id', $key, '=')
+            ->execute();
+        }
+      }
+    }
+    if (!empty($entity->winners)) {
+      for ($i = 1; $i <= 63; $i++) {
+        if (!empty($entity->winners[$i])) {
+          $team_id = $entity->winners[$i];
+        } else {
+          $team_id = NULL;
+        }
+        $num_updated = db_update('tour64_league_winners')
+          ->fields(array(
+            'team_id' =>  $team_id,
+          ))
+          ->condition('league_id', $entity->league_id, '=')
+          ->condition('winner_id', $i, '=')
+          ->execute();
+      }
+    }
+  } elseif ($type == 'tour64_entries') {
+    for ($i = 1; $i <= 63; $i++) {
+      if (!empty($entity->winners[$i])) {
+        $team_id = $entity->winners[$i];
+      } else {
+        $team_id = NULL;
+      }
+      $num_updated = db_update('tour64_entry_winners')
+        ->fields(array(
+          'team_id' =>  $team_id,
+        ))
+        ->condition('entry_id', $entity->entry_id, '=')
+        ->condition('winner_id', $i, '=')
+        ->execute();
+    }
+  }
+
+}
+
+/**
+ * Implements hook_menu().
+ */
+function tournament_64_menu() {
+
+  $items = array();
+
+  // leagues
+  $items['tournament-64/add'] = array(
+    'title' => 'Add League',
+    'page callback' => 'tour64_league_add',
+    'type' => MENU_LOCAL_ACTION,
+    'access callback' => 'entity_access',
+    'access arguments' => array('create', 'tour64_leagues'),
+    'file' => 'tournament_64.form.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+  );
+
+  $items['tournament-64/%entity_object'] = array(
+    'load arguments' => array('tour64_leagues'),
+    'title callback' => 'entity_label',
+    'title arguments' => array('tour64_leagues', 1),
+    'page callback' => 'entity_ui_entity_page_view',
+    'page arguments' => array(1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('view', 'tour64_leagues', 1),
+    'file' => 'tournament_64.pages.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+  );
+
+  $items['tournament-64/%entity_object/view'] = array(
+    'load arguments' => array('tour64_leagues'),
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items['tournament-64/%entity_object/edit'] = array(
+    'load arguments' => array('tour64_leagues'),
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tour64_league_form', 1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('edit', 'tour64_leagues', 1),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'tournament_64.form.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+    'weight' => 1,
+  );
+
+  $items['tournament-64/%entity_object/delete'] = array(
+    'load arguments' => array('tour64_leagues'),
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tour64_delete_form', 1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('delete', 'tour64_leagues', 1),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'tournament_64.form.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+    'weight' => 2,
+  );
+  
+  $items['tournament-64/%entity_object/teams'] = array(
+    'load arguments' => array('tour64_leagues'),
+    'title' => 'Teams',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tour64_league_teams_form', 1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('edit', 'tour64_leagues', 1),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'tournament_64.form.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+    'weight' => 3,
+  );
+
+  $items['tournament-64/%entity_object/winners'] = array(
+    'load arguments' => array('tour64_leagues'),
+    'title' => 'Winners',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tour64_league_winners_form', 1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('edit', 'tour64_leagues', 1),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'tournament_64.form.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+    'weight' => 4,
+  );
+
+  $items['tournament-64/%entity_object/bracket'] = array(
+    'load arguments' => array('tour64_leagues'),
+    'title' => 'Bracket',
+    'page callback' => 'tour64_league_bracket',
+    'page arguments' => array(1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('view', 'tour64_leagues', 1),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'tournament_64.pages.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+    'weight' => 5,
+  );
+
+  $items['tournament-64/%entity_object/entries/add'] = array(
+    'load arguments' => array('tour64_leagues'),
+    'title' => 'Add Entry',
+    'page callback' => 'tour64_entry_add',
+    'page arguments' => array(1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('create', 'tour64_entries', 1),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'tournament_64.form.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+  );
+
+  $items['tournament-64/%entity_object/entries/addfavourite'] = array(
+    'load arguments' => array('tour64_leagues'),
+    'title' => 'Add Entry With Favourites Preselected',
+    'page callback' => 'tour64_entry_addfavourite',
+    'page arguments' => array(1),
+    'access callback' => 'entity_access',
+    'access arguments' => array('create', 'tour64_entries', 1),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'tournament_64.form.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+  );
+
+  $items['tournament-64/%/entries/%entity_object'] = array(
+    'load arguments' => array('tour64_entries'),
+    'title callback' => 'entity_label',
+    'title arguments' => array('tour64_entries', 3),
+    'page callback' => 'tour64_entity_view',
+    'page arguments' => array('tour64_entries', 3),
+    'access callback' => 'entity_access',
+    'access arguments' => array('view', 'tour64_entries', 3),
+    'file' => 'tournament_64.pages.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+  );
+
+  $items['tournament-64/%/entries/%entity_object/view'] = array(
+    'load arguments' => array('tour64_entries'),
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items['tournament-64/%/entries/%entity_object/edit'] = array(
+    'load arguments' => array('tour64_entries'),
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tour64_entry_form', 3),
+    'access callback' => 'entity_access',
+    'access arguments' => array('edit', 'tour64_entries', 3),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'tournament_64.form.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+    'weight' => 1,
+  );
+
+  $items['tournament-64/%/entries/%entity_object/delete'] = array(
+    'load arguments' => array('tour64_entries'),
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tour64_delete_form', 3),
+    'access callback' => 'entity_access',
+    'access arguments' => array('delete', 'tour64_entries', 3),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'tournament_64.form.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+    'weight' => 2,
+  );
+
+  $items['tournament-64/%/entries/%entity_object/bracket'] = array(
+    'load arguments' => array('tour64_entries'),
+    'title' => 'Bracket',
+    'page callback' => 'tour64_entry_bracket',
+    'page arguments' => array(3),
+    'access callback' => 'entity_access',
+    'access arguments' => array('view', 'tour64_entries', 3),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'tournament_64.pages.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+    'weight' => 3,
+  );
+
+  $items['tournament-64/%/entries/%entity_object/paid'] = array(
+    'load arguments' => array('tour64_entries'),
+    'title' => 'Paid',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('tour64_entry_paid_form', 3),
+    // only allow access if you can edit league
+    'access callback' => 'tour64_paid_access',
+    'access arguments' => array(3),
+    'type' => MENU_LOCAL_TASK,
+    'file' => 'tournament_64.form.inc',
+    'file path' => drupal_get_path('module', 'tournament_64'),
+    'weight' => 4,
+  );
+  
+  return $items;
+  
+}
+
+/**
+ * Implements hook_permission().
+ */
+function tournament_64_permission() {
+  
+  $entity_type = 'tour64_leagues';
+  $entity_info = entity_get_info($entity_type);
+  
+  $league_permissions = array(
+    'create ' . $entity_type . ' entities' => array(
+      'title' => t('Create ' . $entity_info['plural label']),
+      'description' => t('Allows users to create ' . $entity_info['plural label'] . '.'),
+    ),
+    'view ' . $entity_type . ' entities' => array(
+      'title' => t('View ' . $entity_info['plural label']),
+      'description' => t('Allows users to view ' . $entity_info['plural label'] . '.'),
+    ),
+    'edit own ' . $entity_type . ' entities' => array(
+      'title' => t('Edit Own ' . $entity_info['plural label']),
+      'description' => t('Allows users to edit own ' . $entity_info['plural label'] . '.'),
+    ),
+    'delete own ' . $entity_type . ' entities' => array(
+      'title' => t('Delete Own ' . $entity_info['plural label']),
+      'description' => t('Allows users to delete own ' . $entity_info['plural label'] . '.'),
+    ),
+  );
+  
+  $entity_type = 'tour64_entries';
+  $entity_info = entity_get_info($entity_type);
+  
+  $entry_permissions = array(
+    'create ' . $entity_type . ' entities' => array(
+      'title' => t('Create ' . $entity_info['plural label']),
+      'description' => t('Allows users to create ' . $entity_info['plural label'] . '.'),
+    ),
+    'view ' . $entity_type . ' entities' => array(
+      'title' => t('View ' . $entity_info['plural label']),
+      'description' => t('Allows users to view ' . $entity_info['plural label'] . '.'),
+    ),
+    'edit own ' . $entity_type . ' entities' => array(
+      'title' => t('Edit Own ' . $entity_info['plural label']),
+      'description' => t('Allows users to edit own ' . $entity_info['plural label'] . '.'),
+    ),
+    'delete own ' . $entity_type . ' entities' => array(
+      'title' => t('Delete Own ' . $entity_info['plural label']),
+      'description' => t('Allows users to delete own ' . $entity_info['plural label'] . '.'),
+    ),
+  );
+
+  return array_merge(
+    $league_permissions,
+    $entry_permissions
+  );
+
+}
+
+/**
+ * Implements hook_theme().
+ *
+ * Defines the theming capabilities provided by this module.
+ */
+function tournament_64_theme() {
+  return array(
+    'tour64_textfield' => array(
+      // We use 'render element' when the item to be passed is a self-describing
+      // render array (it will have #theme_wrappers)
+      'render element' => 'element',
+      'file' => 'tournament_64.theme.inc',
+    ),
+    'tour64_bracket' => array(
+      'variables' => array(
+        'tour64_teams' => NULL,
+        'tour64_round' => NULL,
+        'tour64_side' => NULL,
+        'tour64_extras' => NULL,
+      ),
+      'file' => 'tournament_64.theme.inc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_TYPE_load().
+ */
+function tournament_64_tour64_entries_load($entities) {
+
+  foreach ($entities as $entity) {
+    // load winners
+    $results = db_query('SELECT *
+      FROM {tour64_entry_winners} t WHERE t.entry_id = :entry_id', array(':entry_id' => $entity->entry_id));
+
+    $entity->winners = array();
+
+    foreach ($results as $record) {
+      $entity->winners[$record->winner_id] = $record->team_id;
+    }
+    
+  }
+  
+}
+
+/**
+ * Implements hook_TYPE_load().
+ */
+function tournament_64_tour64_leagues_load($entities) {
+
+  foreach ($entities as $entity) {
+    // convert close time to current timezone
+    $timezone = date_default_timezone();
+    $datetime = new dateObject($entity->close_time, 'UTC');
+    $timezone = $timezone;
+    $datetime->setTimezone(new DateTimeZone($timezone));
+    $entity->close_time = $datetime->format('Y-m-d H:i:s');
+    
+    for ($i = 1; $i <= 6; $i++) {
+      $field = 'round_' . $i . '_points';
+      $entity->points[$i] = $entity->$field;
+    }
+    for ($i = 1; $i <= 4; $i++) {
+      $field = 'section_' . $i . '_name';
+      $entity->sections[$i] = $entity->$field;
+    }
+    // load teams
+    $results = db_query('SELECT *
+      FROM {tour64_league_teams} t WHERE t.league_id = :league_id', array(':league_id' => $entity->league_id));
+
+    $entity->teams = array();
+
+    foreach ($results as $record) {
+      $entity->teams[$record->team_id] = array(
+        'seed' => $record->seed,
+        'description' => $record->description,
+        'section' => $record->section,
+        'name' => $record->seed . ' ' . $record->description,
+      );
+    }
+    // load winners
+    $results = db_query('SELECT *
+      FROM {tour64_league_winners} t WHERE t.league_id = :league_id', array(':league_id' => $entity->league_id));
+
+    $entity->winners = array();
+
+    foreach ($results as $record) {
+      $entity->winners[$record->winner_id] = $record->team_id;
+    }
+    
+  }
+  
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function tournament_64_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'tournament_64'),
+  );
+}
+
+/**
+ * Tournament 64 entity access
+ */
+function tour64_entity_access($op, $entity, $account = NULL, $entity_type = NULL) {
+
+  if (empty($entity_type)) {
+    return FALSE;
+  }
+  
+  global $user;
+
+  if (!isset($account)) {
+    $account = $user;
+  }
+
+  // do not allow deleting league if entries exist
+  if ($entity_type == 'tour64_leagues' and $op == 'delete') {
+    $result = db_query('SELECT count(*) FROM {tour64_entries}
+      WHERE league_id = :league_id', array(':league_id' => $entity->league_id))->fetchField();
+
+    if (!empty($result)) {
+      return FALSE;
+    }
+  }
+
+  // User #1 has all privileges:
+  if ($account->uid == 1) {
+    return TRUE;
+  }
+
+  // Give administrators full access
+  if (in_array('administrator', $account->roles)) {
+    return TRUE;
+  }
+  
+  // anonymous users never have edit or delete rights
+  if ($account->uid == 0 and ($op == 'edit' or $op == 'delete')) {
+    return FALSE;
+  }
+  
+  switch ($op) {
+    case 'create':
+      $user_access = user_access('create ' . $entity_type. ' entities', $account);
+      break;
+    case 'view':
+      $user_access = user_access('view ' . $entity_type. ' entities', $account);
+      break;
+    case 'edit':
+      $user_access = user_access('edit own ' . $entity_type. ' entities', $account);
+      break;
+    case 'delete':
+      $user_access = user_access('delete own ' . $entity_type. ' entities', $account);
+      break;
+  }
+
+  if (empty($user_access)) {
+    return FALSE;
+  }
+  
+  // allow league creator to always change entries
+  if ($entity_type == 'tour64_entries') {
+    $league_entity = entity_load('tour64_leagues', array($entity->league_id));
+    $league_entity = reset($league_entity);
+    if ($account->uid == $league_entity->uid) {
+      return TRUE;
+    }
+  }
+  
+  // check to make sure league is not closed
+  if ($entity_type == 'tour64_entries' and $op == 'create') {
+    //date_default_timezone_set('UTC');
+    $close_time = strtotime($entity->close_time);
+    if ($close_time < time()) {
+      return FALSE;
+    }
+  }
+
+  // edit and delete are only allowed to edit their own entries
+  if ($entity_type == 'tour64_entries' and ($op == 'edit' or $op == 'delete')) {
+    $league_entity = entity_load('tour64_leagues', array($entity->league_id));
+    $league_entity = reset($league_entity);
+    $close_time = strtotime($league_entity->close_time);
+    if ($close_time < time()) {
+      return FALSE;
+    }
+    if ($account->uid <> $entity->uid) {
+      return FALSE;
+    }
+  }
+ 
+  // edit and delete are only allowed to edit their own entries
+  if ($entity_type == 'tour64_leagues' and ($op == 'edit' or $op == 'delete')) {
+    if ($account->uid <> $entity->uid) {
+      return FALSE;
+    }
+  }
+  
+  return $user_access;
+  
+}
+
+/**
+ * only allow access to paid form if you can edit league
+ */
+function tour64_paid_access($entity) {
+  $league_entity = entity_load('tour64_leagues', array($entity->league_id));
+  $league_entity = reset($league_entity);
+  return entity_access('edit', 'tour64_leagues', $league_entity);
+}
+
+/**
+ * return all teams that have lost
+ */
+function tour64_teams_lost($winners) {
+
+  $losers = array();
+  
+  for ($pick_number = 1; $pick_number <= 32; $pick_number++) {
+    if (!empty($winners[$pick_number])) {
+      $team1 = $pick_number * 2 - 1;
+      $team2 = $pick_number * 2;
+      if ($team1 == $winners[$pick_number]) {
+        $losers[] = $team2;
+      } else {
+        $losers[] = $team1;
+      }
+    }
+  }
+  
+  for ($pick_number = 33; $pick_number <= 63; $pick_number++) {
+    if (!empty($winners[$pick_number])) {
+      $previous_pick_1 = $pick_number - 33;
+      $previous_pick_1 = $previous_pick_1 * 2 + 1;
+      $previous_pick_2 = $previous_pick_1 + 1;
+      $team1 = $winners[$previous_pick_1];
+      $team2 = $winners[$previous_pick_2];
+      if ($team1 == $winners[$pick_number]) {
+        $losers[] = $team2;
+      } else {
+        $losers[] = $team1;
+      }
+    }
+  }
+  
+  return ($losers);
+
+}
