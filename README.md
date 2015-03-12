@@ -1,4 +1,3 @@
-# drupal-tournament-64
 Drupal Module - Single Elimination 64 Team Tournament
 =====================================================
 
