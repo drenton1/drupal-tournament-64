@@ -1,0 +1,109 @@
+<?php
+
+/**
+ * @file
+ * Tournament 64 tables
+ *
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function tournament_64_schema() {
+  $schema = array();
+
+  $schema['tour64_leagues'] = array(
+    'description' => 'Tournament Leagues',
+    'fields' => array(
+      'league_id' => array('description' => 'League ID', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'description' => array('description' => 'Description', 'type' => 'varchar', 'length' => 255, 'not null' => TRUE),
+      'comments' => array('description' => 'Comments', 'type' => 'text', 'size' => 'big', 'not null' => FALSE),
+      'close_time' => array('description' => 'Close Time', 'type' => 'datetime', 'mysql_type' => 'datetime', 'not null' => FALSE),
+      'round_1_points' => array('description' => 'Round 1 Points', 'type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE),
+      'round_2_points' => array('description' => 'Round 2 Points', 'type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE),
+      'round_3_points' => array('description' => 'Round 3 Points', 'type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE),
+      'round_4_points' => array('description' => 'Round 4 Points', 'type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE),
+      'round_5_points' => array('description' => 'Round 5 Points', 'type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE),
+      'round_6_points' => array('description' => 'Round 6 Points', 'type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE),
+      'section_1_name' => array('description' => 'Section 1 Name', 'type' => 'varchar', 'length' => 255, 'not null' => FALSE),
+      'section_2_name' => array('description' => 'Section 2 Name', 'type' => 'varchar', 'length' => 255, 'not null' => FALSE),
+      'section_3_name' => array('description' => 'Section 3 Name', 'type' => 'varchar', 'length' => 255, 'not null' => FALSE),
+      'section_4_name' => array('description' => 'Section 4 Name', 'type' => 'varchar', 'length' => 255, 'not null' => FALSE),
+      'uid' => array('description' => 'User ID', 'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'created' => array('description' => 'Date Created', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'changed' => array('description' => 'Date Changed', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+    ),
+    'unique keys' => array('uk' => array('description')),
+    'primary key' => array('league_id'),
+  );
+
+  $schema['tour64_league_teams'] = array(
+    'description' => 'Tournament League Teams',
+    'fields' => array(
+      'id' => array('description' => 'ID', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      // 1 to 64
+      'team_id' => array('description' => 'Team ID', 'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'league_id' => array('description' => 'League ID', 'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'seed' => array('description' => 'Seed', 'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'description' => array('description' => 'Team Name', 'type' => 'varchar', 'length' => 255, 'not null' => FALSE),
+      'section' => array('description' => 'Section', 'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+    ),
+    'unique keys' => array(
+      'uk' => array('league_id', 'team_id'),
+    ),
+    'primary key' => array('id'),
+  );
+
+  $schema['tour64_league_winners'] = array(
+    'description' => 'Tournament League Winners',
+    'fields' => array(
+      'id' => array('description' => 'ID', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      // 1 to 63
+      'winner_id' => array('description' => 'Winner ID', 'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'team_id' => array('description' => 'Team ID', 'type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE),
+      'league_id' => array('description' => 'League ID', 'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+    ),
+    'unique keys' => array(
+      'uk' => array('league_id', 'winner_id'),
+    ),
+    'primary key' => array('id'),
+  );
+
+  $schema['tour64_entries'] = array(
+    'description' => 'Tournament Entries',
+    'fields' => array(
+      'entry_id' => array('description' => 'Entry ID', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      'nickname' => array('description' => 'Nickname', 'type' => 'varchar', 'length' => 255, 'not null' => TRUE),
+      'league_id' => array('description' => 'League ID', 'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'uid' => array('description' => 'User ID', 'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'paid' => array('description' => 'Paid', 'type' => 'varchar', 'length' => 1, 'not null' => FALSE),
+      'tiebreaker' => array('description' => 'Tiebreaker', 'type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE),
+      'points' => array('description' => 'Points', 'type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE),
+      'position' => array('description' => 'Position', 'type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE),
+      'total_points_possible' => array('description' => 'Total Points Possible', 'type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE),
+      'created' => array('description' => 'Date Created', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+      'changed' => array('description' => 'Date Changed', 'type' => 'int', 'not null' => TRUE, 'default' => 0),
+    ),
+    'unique keys' => array(
+      'uk' => array('league_id', 'nickname'),
+    ),
+    'primary key' => array('entry_id'),
+  );
+
+  $schema['tour64_entry_winners'] = array(
+    'description' => 'Tournament Entry Winners',
+    'fields' => array(
+      'id' => array('description' => 'ID', 'type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+      // 1 to 63
+      'winner_id' => array('description' => 'Winner ID', 'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+      'team_id' => array('description' => 'Team ID', 'type' => 'int', 'unsigned' => TRUE, 'not null' => FALSE),
+      'entry_id' => array('description' => 'Entry ID', 'type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE),
+    ),
+    'unique keys' => array(
+      'uk' => array('entry_id', 'winner_id'),
+    ),
+    'primary key' => array('id'),
+  );
+
+  return $schema;
+}
