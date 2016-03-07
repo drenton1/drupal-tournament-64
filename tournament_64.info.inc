@@ -128,12 +128,89 @@ function tournament_64_entity_property_info() {
     'setter callback' => 'entity_property_verbatim_set',
   );
 
+  $properties['prediction_first'] = array(
+    'label' => t('First Place'),
+    'description' => t('First Place'),
+    'type' => 'integer',
+    'schema field' => 'prediction_first',
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  $properties['prediction_second'] = array(
+    'label' => t('Second Place'),
+    'description' => t('Second Place'),
+    'type' => 'integer',
+    'schema field' => 'prediction_second',
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  $properties['prediction_third'] = array(
+    'label' => t('Tie Third Place'),
+    'description' => t('Tie Third Place'),
+    'type' => 'integer',
+    'schema field' => 'prediction_third',
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  $properties['prediction_fourth'] = array(
+    'label' => t('Tie Third Place'),
+    'description' => t('Tie Third Place'),
+    'type' => 'integer',
+    'schema field' => 'prediction_fourth',
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
+  $properties['league_id'] = array(
+    'label' => t('League ID'),
+    'description' => t('League ID'),
+    'type' => 'integer',
+    'schema field' => 'league_id',
+    'setter callback' => 'entity_property_verbatim_set',
+  );
+
   // Add a computed property for the entity URL and expose it to views.
   $properties['url'] = array(
     'label' => t('URL'),
     'description' => t('The URL of the entity.'),
     'getter callback' => 'entity_metadata_entity_get_properties',
     'type' => 'uri',
+    'computed' => TRUE,
+    'entity views field' => TRUE,
+  );
+
+  // add actual prediction names
+  $properties['prediction_first_name'] = array(
+    'label' => t('First Place'),
+    'description' => t('First Place Name'),
+    'getter callback' => 'tour64_get_prediction_callback',
+    'type' => 'text',
+    'computed' => TRUE,
+    'entity views field' => TRUE,
+  );
+
+  $properties['prediction_second_name'] = array(
+    'label' => t('Second Place'),
+    'description' => t('Second Place Name'),
+    'getter callback' => 'tour64_get_prediction_callback',
+    'type' => 'text',
+    'computed' => TRUE,
+    'entity views field' => TRUE,
+  );
+
+  $properties['prediction_third_name'] = array(
+    'label' => t('Tie Third Place'),
+    'description' => t('Tie Third Place Name'),
+    'getter callback' => 'tour64_get_prediction_callback',
+    'type' => 'text',
+    'computed' => TRUE,
+    'entity views field' => TRUE,
+  );
+
+  $properties['prediction_fourth_name'] = array(
+    'label' => t('Tie Third Place'),
+    'description' => t('Tie Third Place Name'),
+    'getter callback' => 'tour64_get_prediction_callback',
+    'type' => 'text',
     'computed' => TRUE,
     'entity views field' => TRUE,
   );

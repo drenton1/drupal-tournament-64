@@ -183,6 +183,26 @@ $handler->display->display_options['fields']['paid']['table'] = 'tour64_entries'
 $handler->display->display_options['fields']['paid']['field'] = 'paid';
 $handler->display->display_options['fields']['paid']['alter']['make_link'] = TRUE;
 $handler->display->display_options['fields']['paid']['alter']['path'] = '[url]/paid?destination=tournament-64/[league_id]/entries';
+/* Field: Tournament 64 Entry: First Place */
+$handler->display->display_options['fields']['prediction_first_name']['id'] = 'prediction_first_name';
+$handler->display->display_options['fields']['prediction_first_name']['table'] = 'views_entity_tour64_entries';
+$handler->display->display_options['fields']['prediction_first_name']['field'] = 'prediction_first_name';
+$handler->display->display_options['fields']['prediction_first_name']['link_to_entity'] = 0;
+/* Field: Tournament 64 Entry: Second Place */
+$handler->display->display_options['fields']['prediction_second_name']['id'] = 'prediction_second_name';
+$handler->display->display_options['fields']['prediction_second_name']['table'] = 'views_entity_tour64_entries';
+$handler->display->display_options['fields']['prediction_second_name']['field'] = 'prediction_second_name';
+$handler->display->display_options['fields']['prediction_second_name']['link_to_entity'] = 0;
+/* Field: Tournament 64 Entry: Tie Third Place */
+$handler->display->display_options['fields']['prediction_fourth_name']['id'] = 'prediction_fourth_name';
+$handler->display->display_options['fields']['prediction_fourth_name']['table'] = 'views_entity_tour64_entries';
+$handler->display->display_options['fields']['prediction_fourth_name']['field'] = 'prediction_fourth_name';
+$handler->display->display_options['fields']['prediction_fourth_name']['link_to_entity'] = 0;
+/* Field: Tournament 64 Entry: Tie Third Place */
+$handler->display->display_options['fields']['prediction_third_name']['id'] = 'prediction_third_name';
+$handler->display->display_options['fields']['prediction_third_name']['table'] = 'views_entity_tour64_entries';
+$handler->display->display_options['fields']['prediction_third_name']['field'] = 'prediction_third_name';
+$handler->display->display_options['fields']['prediction_third_name']['link_to_entity'] = 0;
 /* Sort criterion: Tournament 64 Entry: Position */
 $handler->display->display_options['sorts']['position']['id'] = 'position';
 $handler->display->display_options['sorts']['position']['table'] = 'tour64_entries';

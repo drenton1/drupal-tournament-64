@@ -54,7 +54,7 @@ function theme_tour64_textfield($variables) {
   element_set_attributes($element, array('id', 'name', 'value', 'size', 'maxlength'));
   _form_set_class($element, array('tour64-team-pick'));
 
-  $output = '<div id="tour64-id-' . $element['#parents'][1] . '"><input' . drupal_attributes($element['#attributes']) . ' /></div>';
-  
+  $output = '<div id="tour64-id-' . $element['#parents'][1] . '" title="' . $variables['element']['#value'] . '"><input' . drupal_attributes($element['#attributes']) . ' /></div>';
+ 
   return $output;
 }

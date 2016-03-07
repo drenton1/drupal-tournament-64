@@ -716,3 +716,32 @@ function tour64_teams_lost($winners) {
   return ($losers);
 
 }
+
+/**
+ * convert team id to name for views
+ */
+function tour64_get_prediction_callback($entity, array $options, $name, $entity_type) {
+  if (!empty($entity->league_id)) {
+    if ($name == 'prediction_first_name' and !empty($entity->prediction_first)) {
+      $league_entity = entity_load('tour64_leagues', array($entity->league_id));
+      $league_entity = reset($league_entity);
+      return $league_entity->teams[$entity->prediction_first]['name'];
+    }
+    if ($name == 'prediction_second_name' and !empty($entity->prediction_second)) {
+      $league_entity = entity_load('tour64_leagues', array($entity->league_id));
+      $league_entity = reset($league_entity);
+      return $league_entity->teams[$entity->prediction_second]['name'];
+    }
+    if ($name == 'prediction_third_name' and !empty($entity->prediction_third)) {
+      $league_entity = entity_load('tour64_leagues', array($entity->league_id));
+      $league_entity = reset($league_entity);
+      return $league_entity->teams[$entity->prediction_third]['name'];
+    }
+    if ($name == 'prediction_fourth_name' and !empty($entity->prediction_fourth)) {
+      $league_entity = entity_load('tour64_leagues', array($entity->league_id));
+      $league_entity = reset($league_entity);
+      return $league_entity->teams[$entity->prediction_fourth]['name'];
+    }
+  }
+  return '';
+}
