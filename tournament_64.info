@@ -6,3 +6,4 @@ files[] = tournament_64.controller.inc
 dependencies[] = date_popup
 dependencies[] = entity
 dependencies[] = views
+stylesheets[all][] = tournament_64.css
