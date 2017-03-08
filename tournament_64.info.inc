@@ -180,7 +180,7 @@ function tournament_64_entity_property_info() {
 
   // add actual prediction names
   $properties['prediction_first_name'] = array(
-    'label' => t('First Place'),
+    'label' => t('First Place Name'),
     'description' => t('First Place Name'),
     'getter callback' => 'tour64_get_prediction_callback',
     'type' => 'text',
@@ -189,7 +189,7 @@ function tournament_64_entity_property_info() {
   );
 
   $properties['prediction_second_name'] = array(
-    'label' => t('Second Place'),
+    'label' => t('Second Place Name'),
     'description' => t('Second Place Name'),
     'getter callback' => 'tour64_get_prediction_callback',
     'type' => 'text',
@@ -198,7 +198,7 @@ function tournament_64_entity_property_info() {
   );
 
   $properties['prediction_third_name'] = array(
-    'label' => t('Tie Third Place'),
+    'label' => t('Tie Third Place Name'),
     'description' => t('Tie Third Place Name'),
     'getter callback' => 'tour64_get_prediction_callback',
     'type' => 'text',
@@ -207,9 +207,46 @@ function tournament_64_entity_property_info() {
   );
 
   $properties['prediction_fourth_name'] = array(
-    'label' => t('Tie Third Place'),
+    'label' => t('Tie Third Place Name'),
     'description' => t('Tie Third Place Name'),
     'getter callback' => 'tour64_get_prediction_callback',
+    'type' => 'text',
+    'computed' => TRUE,
+    'entity views field' => TRUE,
+  );
+
+  // add css for predictions
+  $properties['prediction_first_css'] = array(
+    'label' => t('First Place CSS'),
+    'description' => t('First Place CSS'),
+    'getter callback' => 'tour64_get_prediction_css_callback',
+    'type' => 'text',
+    'computed' => TRUE,
+    'entity views field' => TRUE,
+  );
+
+  $properties['prediction_second_css'] = array(
+    'label' => t('Second Place CSS'),
+    'description' => t('Second Place CSS'),
+    'getter callback' => 'tour64_get_prediction_css_callback',
+    'type' => 'text',
+    'computed' => TRUE,
+    'entity views field' => TRUE,
+  );
+
+  $properties['prediction_third_css'] = array(
+    'label' => t('Third Place CSS'),
+    'description' => t('Third Place CSS'),
+    'getter callback' => 'tour64_get_prediction_css_callback',
+    'type' => 'text',
+    'computed' => TRUE,
+    'entity views field' => TRUE,
+  );
+
+  $properties['prediction_fourth_css'] = array(
+    'label' => t('Fourth Place CSS'),
+    'description' => t('Fourth Place CSS'),
+    'getter callback' => 'tour64_get_prediction_css_callback',
     'type' => 'text',
     'computed' => TRUE,
     'entity views field' => TRUE,
