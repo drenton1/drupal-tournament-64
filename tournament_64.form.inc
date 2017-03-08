@@ -153,10 +153,6 @@ function tour64_entry_form($form, &$form_state, $entity) {
     '#element_validate' => array('element_validate_integer_positive'),
   );
 
-  $form['#attached']['css'][] = array(
-    'data' => drupal_get_path('module', 'tournament_64') . '/tournament_64.css',
-  );
-  
   $form_state['entity'] = $entity;
   $league_entity = entity_load('tour64_leagues', array($entity->league_id));
   $league_entity = reset($league_entity);
@@ -401,10 +397,6 @@ function tour64_league_teams_form($form, &$form_state, $entity) {
 
 function tour64_league_winners_form($form, &$form_state, $entity) {
 
-  $form['#attached']['css'][] = array(
-    'data' => drupal_get_path('module', 'tournament_64') . '/tournament_64.css',
-  );
-  
   $form_state['entity'] = $entity;
   $form_state['tour64_teams'] = $entity->teams;
   
