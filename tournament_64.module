@@ -745,3 +745,92 @@ function tour64_get_prediction_callback($entity, array $options, $name, $entity_
   }
   return '';
 }
+
+/**
+ * apply css if prediction is right or wrong
+ */
+function tour64_get_prediction_css_callback($entity, array $options, $name, $entity_type) {
+  if (!empty($entity->league_id)) {
+
+    $league_entity = entity_load_single('tour64_leagues', $entity->league_id);
+    $teams_lost = tour64_teams_lost($league_entity->winners);
+    
+    if (!empty($league_entity->winners[63])) {
+      $champion = $league_entity->winners[63];
+    }
+    if (!empty($league_entity->winners[62])) {
+      $finalists[] = $league_entity->winners[62];
+    }
+    if (!empty($league_entity->winners[61])) {
+      $finalists[] = $league_entity->winners[61];
+    }
+    if (!empty($league_entity->winners[60])) {
+      $semi_finalists[] = $league_entity->winners[60];
+    }
+    if (!empty($league_entity->winners[59])) {
+      $semi_finalists[] = $league_entity->winners[59];
+    }
+    if (!empty($league_entity->winners[58])) {
+      $semi_finalists[] = $league_entity->winners[58];
+    }
+    if (!empty($league_entity->winners[57])) {
+      $semi_finalists[] = $league_entity->winners[57];
+    }
+
+    if ($name == 'prediction_first_css' and !empty($entity->prediction_first)) {
+      // check if our champion has already lost
+      if (in_array($entity->prediction_first, $teams_lost)) {
+        return 'tour64-match-lost';
+      }
+      
+      if (!empty($champion)) {
+        if ($entity->prediction_first == $champion) {
+          return 'tour64-match-won';
+        } else {
+          return 'tour64-match-lost';
+        }
+      }
+    }
+
+    if ($name == 'prediction_second_css' and !empty($entity->prediction_second)) {
+      // check if our second place team lost before the finals
+      if (!empty($finalists)) {
+        if (in_array($entity->prediction_second, $finalists)) {
+          return 'tour64-match-won';
+        }
+      }
+
+      if (in_array($entity->prediction_second, $teams_lost)) {
+        return 'tour64-match-lost';
+      }
+    }
+
+    if ($name == 'prediction_third_css' and !empty($entity->prediction_third)) {
+      // check if our third place team lost before the semi finals
+      if (!empty($semi_finalists)) {
+        if (in_array($entity->prediction_third, $semi_finalists)) {
+          return 'tour64-match-won';
+        }
+      }
+
+      if (in_array($entity->prediction_third, $teams_lost)) {
+        return 'tour64-match-lost';
+      }
+    }
+
+    if ($name == 'prediction_fourth_css' and !empty($entity->prediction_fourth)) {
+      // check if our fourth place team lost before the semi finals
+      if (!empty($semi_finalists)) {
+        if (in_array($entity->prediction_fourth, $semi_finalists)) {
+          return 'tour64-match-won';
+        }
+      }
+
+      if (in_array($entity->prediction_fourth, $teams_lost)) {
+        return 'tour64-match-lost';
+      }
+    }
+    
+  }
+  return '';
+}
