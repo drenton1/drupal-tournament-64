@@ -62,6 +62,10 @@ $handler->display->display_options['tab_options']['weight'] = '0';
 
   $views[$view->name] = $view;
 
+
+
+
+
   
 $view = new view();
 $view->name = 'tournament_64_entries';
@@ -183,26 +187,54 @@ $handler->display->display_options['fields']['paid']['table'] = 'tour64_entries'
 $handler->display->display_options['fields']['paid']['field'] = 'paid';
 $handler->display->display_options['fields']['paid']['alter']['make_link'] = TRUE;
 $handler->display->display_options['fields']['paid']['alter']['path'] = '[url]/paid?destination=tournament-64/[league_id]/entries';
-/* Field: Tournament 64 Entry: First Place */
+/* Field: Tournament 64 Entry: First Place CSS */
+$handler->display->display_options['fields']['prediction_first_css']['id'] = 'prediction_first_css';
+$handler->display->display_options['fields']['prediction_first_css']['table'] = 'views_entity_tour64_entries';
+$handler->display->display_options['fields']['prediction_first_css']['field'] = 'prediction_first_css';
+$handler->display->display_options['fields']['prediction_first_css']['exclude'] = TRUE;
+$handler->display->display_options['fields']['prediction_first_css']['link_to_entity'] = 0;
+/* Field: Tournament 64 Entry: Second Place CSS */
+$handler->display->display_options['fields']['prediction_second_css']['id'] = 'prediction_second_css';
+$handler->display->display_options['fields']['prediction_second_css']['table'] = 'views_entity_tour64_entries';
+$handler->display->display_options['fields']['prediction_second_css']['field'] = 'prediction_second_css';
+$handler->display->display_options['fields']['prediction_second_css']['exclude'] = TRUE;
+$handler->display->display_options['fields']['prediction_second_css']['link_to_entity'] = 0;
+/* Field: Tournament 64 Entry: Third Place CSS */
+$handler->display->display_options['fields']['prediction_third_css']['id'] = 'prediction_third_css';
+$handler->display->display_options['fields']['prediction_third_css']['table'] = 'views_entity_tour64_entries';
+$handler->display->display_options['fields']['prediction_third_css']['field'] = 'prediction_third_css';
+$handler->display->display_options['fields']['prediction_third_css']['exclude'] = TRUE;
+$handler->display->display_options['fields']['prediction_third_css']['link_to_entity'] = 0;
+/* Field: Tournament 64 Entry: Fourth Place CSS */
+$handler->display->display_options['fields']['prediction_fourth_css']['id'] = 'prediction_fourth_css';
+$handler->display->display_options['fields']['prediction_fourth_css']['table'] = 'views_entity_tour64_entries';
+$handler->display->display_options['fields']['prediction_fourth_css']['field'] = 'prediction_fourth_css';
+$handler->display->display_options['fields']['prediction_fourth_css']['exclude'] = TRUE;
+$handler->display->display_options['fields']['prediction_fourth_css']['link_to_entity'] = 0;
+/* Field: Tournament 64 Entry: First Place Name */
 $handler->display->display_options['fields']['prediction_first_name']['id'] = 'prediction_first_name';
 $handler->display->display_options['fields']['prediction_first_name']['table'] = 'views_entity_tour64_entries';
 $handler->display->display_options['fields']['prediction_first_name']['field'] = 'prediction_first_name';
+$handler->display->display_options['fields']['prediction_first_name']['element_class'] = '[prediction_first_css]';
 $handler->display->display_options['fields']['prediction_first_name']['link_to_entity'] = 0;
-/* Field: Tournament 64 Entry: Second Place */
+/* Field: Tournament 64 Entry: Second Place Name */
 $handler->display->display_options['fields']['prediction_second_name']['id'] = 'prediction_second_name';
 $handler->display->display_options['fields']['prediction_second_name']['table'] = 'views_entity_tour64_entries';
 $handler->display->display_options['fields']['prediction_second_name']['field'] = 'prediction_second_name';
+$handler->display->display_options['fields']['prediction_second_name']['element_class'] = '[prediction_second_css]';
 $handler->display->display_options['fields']['prediction_second_name']['link_to_entity'] = 0;
-/* Field: Tournament 64 Entry: Tie Third Place */
-$handler->display->display_options['fields']['prediction_fourth_name']['id'] = 'prediction_fourth_name';
-$handler->display->display_options['fields']['prediction_fourth_name']['table'] = 'views_entity_tour64_entries';
-$handler->display->display_options['fields']['prediction_fourth_name']['field'] = 'prediction_fourth_name';
-$handler->display->display_options['fields']['prediction_fourth_name']['link_to_entity'] = 0;
-/* Field: Tournament 64 Entry: Tie Third Place */
+/* Field: Tournament 64 Entry: Tie Third Place Name */
 $handler->display->display_options['fields']['prediction_third_name']['id'] = 'prediction_third_name';
 $handler->display->display_options['fields']['prediction_third_name']['table'] = 'views_entity_tour64_entries';
 $handler->display->display_options['fields']['prediction_third_name']['field'] = 'prediction_third_name';
+$handler->display->display_options['fields']['prediction_third_name']['element_class'] = '[prediction_third_css]';
 $handler->display->display_options['fields']['prediction_third_name']['link_to_entity'] = 0;
+/* Field: Tournament 64 Entry: Tie Third Place Name */
+$handler->display->display_options['fields']['prediction_fourth_name']['id'] = 'prediction_fourth_name';
+$handler->display->display_options['fields']['prediction_fourth_name']['table'] = 'views_entity_tour64_entries';
+$handler->display->display_options['fields']['prediction_fourth_name']['field'] = 'prediction_fourth_name';
+$handler->display->display_options['fields']['prediction_fourth_name']['element_class'] = '[prediction_fourth_css]';
+$handler->display->display_options['fields']['prediction_fourth_name']['link_to_entity'] = 0;
 /* Sort criterion: Tournament 64 Entry: Position */
 $handler->display->display_options['sorts']['position']['id'] = 'position';
 $handler->display->display_options['sorts']['position']['table'] = 'tour64_entries';
