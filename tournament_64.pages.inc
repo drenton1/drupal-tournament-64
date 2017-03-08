@@ -8,10 +8,6 @@
 function tour64_bracket($teams, $winners, $sections, $league_winners = NULL) {
 
   $build = array();
-
-  $build['#attached']['css'][] = array(
-    'data' => drupal_get_path('module', 'tournament_64') . '/tournament_64.css',
-  );
   
   $build[] = array(
     '#markup' => '<div id="bracket" class="tour64-bracket-block">',
